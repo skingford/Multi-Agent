@@ -1,0 +1,20 @@
+{
+  "input": "/Users/kingford/workspace/github.com/oxmon-web/docs/ai-team-kit/examples/sample-input.json",
+  "output_dir": "/Users/kingford/workspace/github.com/oxmon-web/docs/ai-team-kit/output/sample-run",
+  "files": [
+    "PRD.md",
+    "SPRINT_BOARD.md",
+    "ARCHITECTURE.md",
+    "api.swagger.yaml",
+    "schema.sql",
+    "SECURITY_REPORT.md",
+    "REVIEW_REPORT.md"
+  ],
+  "models": {
+    "codex": "gpt-5",
+    "claude_code": "claude-sonnet-4.5",
+    "gemini": "gemini-2.5-pro",
+    "cursor": "openai-compatible-gateway"
+  },
+  "generated_at": "2026-03-05"
+}
