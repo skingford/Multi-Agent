@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-team-kit/schemas/CI_GATE_REPORT.compact.schema.json",
+  "title": "CI Gate Report (Compact)",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "schema_sha256",
+    "report_variant",
+    "report_type",
+    "generated_by",
+    "compatibility",
+    "tool",
+    "passed",
+    "exit_code",
+    "reason",
+    "gate_trace",
+    "selected_proposal_id",
+    "winner_confidence",
+    "selected_security_vote"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "schema_ref": { "type": "string" },
+    "schema_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "report_variant": { "const": "compact" },
+    "report_type": { "const": "ci_gate_report" },
+    "generated_by": { "type": "string" },
+    "compatibility": {
+      "type": "object",
+      "required": ["contract", "backward_compatible_with"],
+      "properties": {
+        "contract": { "const": "ci_gate_report" },
+        "backward_compatible_with": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "tool": { "type": "string" },
+    "passed": { "type": "boolean" },
+    "exit_code": { "type": "integer" },
+    "reason": { "type": "string" },
+    "gate_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "enabled", "passed", "code"],
+        "properties": {
+          "id": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "passed": { "type": "boolean" },
+          "code": { "type": "integer" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "selected_proposal_id": { "type": ["string", "null"] },
+    "winner_confidence": { "type": ["number", "null"] },
+    "selected_security_vote": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-03-06T04:15:39.997Z",
+  "tool": "auto-argue-orchestrator",
+  "input": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/examples/argue-sample-input.json",
+  "output_dir": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/output/sample-argue-ci-report-run",
+  "strict_ci_enabled": false,
+  "gates": {
+    "fail_on_reject": false,
+    "require_security_approve": false,
+    "min_winner_confidence_required": null,
+    "strict_proposal_limit": null
+  },
+  "decision": {
+    "selected_proposal_id": "secure_mvp",
+    "final_status": "approved",
+    "final_reason": "majority_support",
+    "security_gate": "passed",
+    "selected_security_vote": "approve",
+    "winner_confidence": 1
+  },
+  "outcome": {
+    "passed": true,
+    "exit_code": 0,
+    "reason": "ok",
+    "message": "all gates passed"
+  },
+  "artifacts": [
+    "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/output/sample-argue-ci-report-run/AUTO_ARGUE_RESULT.json",
+    "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/output/sample-argue-ci-report-run/AUTO_ARGUE_RESULT.md",
+    "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/output/sample-argue-ci-report-run/CI_GATE_REPORT.json"
+  ]
+}

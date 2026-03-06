@@ -1,0 +1,50 @@
+{
+  "project": {
+    "name": "Oxmon Duplicate ID Demo",
+    "goal": "验证提案 ID 唯一性校验"
+  },
+  "constraints": {
+    "timeline_weeks": 6,
+    "compliance": ["ISO 27001"]
+  },
+  "proposals": [
+    {
+      "id": "dup_1",
+      "proposer": "pm",
+      "title": "提案 A",
+      "description": "A",
+      "timeline_weeks": 6,
+      "business_value": "A",
+      "architecture_notes": ["api gateway", "app service"],
+      "test_plan": ["unit success/failure"],
+      "security_controls": [
+        "tenant_isolation",
+        "authn_authz",
+        "audit_log",
+        "encryption_at_rest",
+        "idempotency",
+        "data_retention_policy"
+      ],
+      "delivery_scope": { "frontend": true, "backend": true, "ui": true }
+    },
+    {
+      "id": "dup_1",
+      "proposer": "architect",
+      "title": "提案 B",
+      "description": "B",
+      "timeline_weeks": 6,
+      "business_value": "B",
+      "architecture_notes": ["api gateway", "app service"],
+      "test_plan": ["unit success/failure"],
+      "security_controls": [
+        "tenant_isolation",
+        "authn_authz",
+        "audit_log",
+        "encryption_at_rest",
+        "idempotency",
+        "data_retention_policy"
+      ],
+      "delivery_scope": { "frontend": true, "backend": true, "ui": true }
+    }
+  ]
+}

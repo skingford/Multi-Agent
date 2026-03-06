@@ -1,0 +1,69 @@
+name: ai-team-kit-ci
+
+on:
+  push:
+    paths:
+      - 'ai-team-kit/**'
+      - 'package.json'
+      - '.github/workflows/ai-team-kit-ci.yml'
+  pull_request:
+    paths:
+      - 'ai-team-kit/**'
+      - 'package.json'
+      - '.github/workflows/ai-team-kit-ci.yml'
+  workflow_dispatch:
+    inputs:
+      node_version:
+        description: 'Node.js version for manual run'
+        required: true
+        default: '22'
+        type: choice
+        options:
+          - '20'
+          - '22'
+      gate_command:
+        description: 'Command to run (default is full gate)'
+        required: true
+        default: 'npm run -s team:ci:gate'
+        type: string
+
+concurrency:
+  group: ai-team-kit-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci-gate:
+    name: ci-gate (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('["{0}"]', inputs.node_version) || '["20","22"]') }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Run AI Team Kit CI gate
+        run: ${{ github.event_name == 'workflow_dispatch' && inputs.gate_command || 'npm run -s team:ci:gate' }}
+
+      - name: Publish gate summary
+        if: always()
+        run: node ai-team-kit/scripts/publish-gate-summary.mjs --markdown >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload debug artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-team-kit-debug-node-${{ matrix.node-version }}
+          if-no-files-found: ignore
+          path: |
+            ai-team-kit/output/sample-argue-ci-report-compact-run/CI_GATE_REPORT.json
+            ai-team-kit/output/sample-run-with-argue-ci-report-compact/run-summary.json
+            ai-team-kit/output/sample-run-with-argue-ci-report-compact/CI_GATE_REPORT.json

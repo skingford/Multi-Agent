@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-team-kit/schemas/run-summary.schema.json",
+  "title": "Team Artifact Run Summary",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "schema_sha256",
+    "input",
+    "output_dir",
+    "files",
+    "argue_enabled",
+    "argue_output_mode",
+    "argue_schema_version",
+    "argue_decision_index",
+    "min_winner_confidence_required",
+    "min_winner_confidence_met",
+    "security_approve_required",
+    "security_approve_met",
+    "strict_ci_enabled",
+    "gate_trace",
+    "gate_outcome",
+    "argue_final_decision",
+    "models",
+    "generated_at"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "schema_ref": { "type": "string" },
+    "schema_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "input": { "type": "string" },
+    "output_dir": { "type": "string" },
+    "files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "argue_enabled": { "type": "boolean" },
+    "argue_output_mode": { "type": "string" },
+    "argue_schema_version": { "type": ["string", "null"] },
+    "argue_decision_index": {
+      "type": ["object", "null"],
+      "properties": {
+        "selected_proposal_id": { "type": ["string", "null"] },
+        "total_proposals": { "type": "integer" },
+        "winner_confidence": { "type": "number" }
+      },
+      "required": ["selected_proposal_id", "total_proposals", "winner_confidence"],
+      "additionalProperties": true
+    },
+    "min_winner_confidence_required": { "type": ["number", "null"] },
+    "min_winner_confidence_met": { "type": ["boolean", "null"] },
+    "security_approve_required": { "type": "boolean" },
+    "security_approve_met": { "type": ["boolean", "null"] },
+    "strict_ci_enabled": { "type": "boolean" },
+    "gate_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "enabled", "passed", "code"],
+        "properties": {
+          "id": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "passed": { "type": "boolean" },
+          "code": { "type": "integer" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "gate_outcome": {
+      "type": "object",
+      "required": ["passed", "exit_code", "reason", "message"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "exit_code": { "type": "integer" },
+        "reason": { "type": "string" },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "argue_final_decision": { "type": ["object", "null"] },
+    "models": { "type": "object" },
+    "generated_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

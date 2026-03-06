@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-team-kit/schemas/CI_GATE_REPORT.full.schema.json",
+  "title": "CI Gate Report (Full)",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "schema_sha256",
+    "report_variant",
+    "report_type",
+    "generated_by",
+    "compatibility",
+    "generated_at",
+    "tool",
+    "input",
+    "output_dir",
+    "strict_ci_enabled",
+    "gates",
+    "decision",
+    "outcome",
+    "gate_trace",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "schema_ref": { "type": "string" },
+    "schema_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "report_variant": { "const": "full" },
+    "report_type": { "const": "ci_gate_report" },
+    "generated_by": { "type": "string" },
+    "compatibility": {
+      "type": "object",
+      "required": ["contract", "backward_compatible_with"],
+      "properties": {
+        "contract": { "const": "ci_gate_report" },
+        "backward_compatible_with": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "generated_at": { "type": "string" },
+    "tool": { "type": "string" },
+    "input": { "type": "string" },
+    "output_dir": { "type": "string" },
+    "strict_ci_enabled": { "type": "boolean" },
+    "gates": {
+      "type": "object",
+      "required": [
+        "fail_on_reject",
+        "require_security_approve",
+        "min_winner_confidence_required",
+        "strict_proposal_limit"
+      ],
+      "properties": {
+        "fail_on_reject": { "type": "boolean" },
+        "require_security_approve": { "type": "boolean" },
+        "min_winner_confidence_required": { "type": ["number", "null"] },
+        "strict_proposal_limit": { "type": ["integer", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "decision": {
+      "type": "object",
+      "required": [
+        "selected_proposal_id",
+        "final_status",
+        "final_reason",
+        "security_gate",
+        "selected_security_vote",
+        "winner_confidence"
+      ],
+      "properties": {
+        "selected_proposal_id": { "type": ["string", "null"] },
+        "final_status": { "type": "string" },
+        "final_reason": { "type": ["string", "null"] },
+        "security_gate": { "type": ["string", "null"] },
+        "selected_security_vote": { "type": ["string", "null"] },
+        "winner_confidence": { "type": ["number", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["passed", "exit_code", "reason", "message"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "exit_code": { "type": "integer" },
+        "reason": { "type": "string" },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "gate_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "enabled", "passed", "code"],
+        "properties": {
+          "id": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "passed": { "type": "boolean" },
+          "code": { "type": "integer" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

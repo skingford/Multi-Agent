@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.1.0",
+  "schema_ref": "ai-team-kit/schemas/run-summary.schema.json",
+  "schema_sha256": "6bf0d7316fc351bef397b8e5c4c660edf6f26f9f3176c9cf5d9bc1056ff71dea",
+  "input": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/examples/argue-sample-input.json",
+  "output_dir": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/output/sample-run-with-argue-ci-report-compact",
+  "files": [
+    "PRD.md",
+    "SPRINT_BOARD.md",
+    "ARCHITECTURE.md",
+    "api.swagger.yaml",
+    "schema.sql",
+    "SECURITY_REPORT.md",
+    "REVIEW_REPORT.md",
+    "AUTO_ARGUE_RESULT.json",
+    "AUTO_ARGUE_RESULT.md"
+  ],
+  "argue_enabled": true,
+  "argue_output_mode": "both",
+  "argue_schema_version": "1.3.0",
+  "argue_decision_index": {
+    "selected_proposal_id": "secure_mvp",
+    "total_proposals": 2,
+    "winner_confidence": 1
+  },
+  "min_winner_confidence_required": null,
+  "min_winner_confidence_met": null,
+  "security_approve_required": false,
+  "security_approve_met": null,
+  "strict_ci_enabled": false,
+  "gate_trace": [
+    {
+      "id": "reject_gate",
+      "enabled": false,
+      "passed": true,
+      "code": 2
+    },
+    {
+      "id": "confidence_gate",
+      "enabled": false,
+      "passed": true,
+      "code": 3
+    },
+    {
+      "id": "security_approve_gate",
+      "enabled": false,
+      "passed": true,
+      "code": 4
+    }
+  ],
+  "gate_outcome": {
+    "passed": true,
+    "exit_code": 0,
+    "reason": "ok",
+    "message": "all enabled gates passed"
+  },
+  "argue_final_decision": {
+    "selected_proposal_id": "secure_mvp",
+    "status": "approved",
+    "reason": "majority_support",
+    "security_gate": "passed"
+  },
+  "models": {},
+  "generated_at": "2026-03-06"
+}

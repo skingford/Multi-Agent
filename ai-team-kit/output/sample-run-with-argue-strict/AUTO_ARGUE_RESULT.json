@@ -1,0 +1,388 @@
+{
+  "project": "Oxmon 高风险极速版",
+  "generated_at": "2026-03-06T01:43:50.415Z",
+  "gate_policy": {
+    "name": "Security One-Vote Veto Gate",
+    "rule": "If security role votes block, proposal is automatically rejected."
+  },
+  "rounds": {
+    "proposal": [
+      {
+        "proposal_id": "unsafe_alpha",
+        "proposer": "pm",
+        "title": "2 周 alpha",
+        "description": "优先速度，不做治理项",
+        "timeline_weeks": 2
+      },
+      {
+        "proposal_id": "unsafe_beta",
+        "proposer": "backend",
+        "title": "3 周 beta",
+        "description": "仅补一点日志，其他后置",
+        "timeline_weeks": 3
+      }
+    ],
+    "objection": [
+      {
+        "proposal_id": "unsafe_alpha",
+        "objections": [
+          {
+            "role": "pm",
+            "findings": []
+          },
+          {
+            "role": "architect",
+            "findings": [
+              {
+                "severity": "high",
+                "issue": "Architecture notes are missing",
+                "fix": "Provide topology, scaling strategy, and consistency strategy"
+              }
+            ]
+          },
+          {
+            "role": "security",
+            "findings": [
+              {
+                "severity": "critical",
+                "issue": "Missing required security controls: tenant_isolation, audit_log, encryption_at_rest, idempotency",
+                "fix": "Add controls: tenant_isolation, audit_log, encryption_at_rest, idempotency"
+              },
+              {
+                "severity": "high",
+                "issue": "Compliance exists but data retention policy is missing",
+                "fix": "Define retention/deletion policy mapped to compliance requirements"
+              }
+            ]
+          },
+          {
+            "role": "ui",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "UI scope is undefined",
+                "fix": "Define design tokens and interaction states"
+              }
+            ]
+          },
+          {
+            "role": "frontend",
+            "findings": []
+          },
+          {
+            "role": "backend",
+            "findings": []
+          },
+          {
+            "role": "reviewer",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "Test plan has no clear failure-path coverage",
+                "fix": "Add negative/failure branch tests for critical APIs"
+              }
+            ]
+          },
+          {
+            "role": "pjm",
+            "findings": [
+              {
+                "severity": "high",
+                "issue": "Timeline 2w is too aggressive for 3 features",
+                "fix": "Split scope or increase timeline to reduce delivery risk"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "proposal_id": "unsafe_beta",
+        "objections": [
+          {
+            "role": "pm",
+            "findings": []
+          },
+          {
+            "role": "architect",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "Architecture notes are too shallow for execution",
+                "fix": "Add API versioning, storage model, and scaling details"
+              }
+            ]
+          },
+          {
+            "role": "security",
+            "findings": [
+              {
+                "severity": "critical",
+                "issue": "Missing required security controls: tenant_isolation, authn_authz, encryption_at_rest, idempotency",
+                "fix": "Add controls: tenant_isolation, authn_authz, encryption_at_rest, idempotency"
+              },
+              {
+                "severity": "high",
+                "issue": "Compliance exists but data retention policy is missing",
+                "fix": "Define retention/deletion policy mapped to compliance requirements"
+              }
+            ]
+          },
+          {
+            "role": "ui",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "UI scope is undefined",
+                "fix": "Define design tokens and interaction states"
+              }
+            ]
+          },
+          {
+            "role": "frontend",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "Frontend scope is undefined",
+                "fix": "Clarify frontend pages and state flow"
+              }
+            ]
+          },
+          {
+            "role": "backend",
+            "findings": []
+          },
+          {
+            "role": "reviewer",
+            "findings": [
+              {
+                "severity": "high",
+                "issue": "Test plan is missing",
+                "fix": "Add success/failure branch tests before implementation"
+              }
+            ]
+          },
+          {
+            "role": "pjm",
+            "findings": [
+              {
+                "severity": "high",
+                "issue": "Timeline 3w is too aggressive for 3 features",
+                "fix": "Split scope or increase timeline to reduce delivery risk"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "vote": [
+      {
+        "proposal_id": "unsafe_alpha",
+        "votes": [
+          {
+            "role": "pm",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "architect",
+            "decision": "changes_requested",
+            "reason": "high risk for this role"
+          },
+          {
+            "role": "security",
+            "decision": "block",
+            "reason": "critical security finding"
+          },
+          {
+            "role": "ui",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "frontend",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "backend",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "reviewer",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "pjm",
+            "decision": "changes_requested",
+            "reason": "high risk for this role"
+          }
+        ]
+      },
+      {
+        "proposal_id": "unsafe_beta",
+        "votes": [
+          {
+            "role": "pm",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "architect",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "security",
+            "decision": "block",
+            "reason": "critical security finding"
+          },
+          {
+            "role": "ui",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "frontend",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "backend",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "reviewer",
+            "decision": "changes_requested",
+            "reason": "high risk for this role"
+          },
+          {
+            "role": "pjm",
+            "decision": "changes_requested",
+            "reason": "high risk for this role"
+          }
+        ]
+      }
+    ]
+  },
+  "proposals": [
+    {
+      "proposal_id": "unsafe_alpha",
+      "status": "rejected",
+      "score": -1000,
+      "reason": "security_veto_gate_triggered",
+      "gate": "blocked",
+      "vote_summary": {
+        "approve": 3,
+        "approve_with_notes": 2,
+        "changes_requested": 2,
+        "block": 1
+      }
+    },
+    {
+      "proposal_id": "unsafe_beta",
+      "status": "rejected",
+      "score": -1000,
+      "reason": "security_veto_gate_triggered",
+      "gate": "blocked",
+      "vote_summary": {
+        "approve": 2,
+        "approve_with_notes": 3,
+        "changes_requested": 2,
+        "block": 1
+      }
+    }
+  ],
+  "final_decision": {
+    "selected_proposal_id": null,
+    "status": "rejected",
+    "reason": "no_approved_proposal_after_gate",
+    "security_gate": "blocked_or_pending_revisions"
+  },
+  "patch_plan": [
+    {
+      "proposal_id": "unsafe_alpha",
+      "actions": [
+        {
+          "step": 1,
+          "owner": "security",
+          "severity": "critical",
+          "action": "Add controls: tenant_isolation, audit_log, encryption_at_rest, idempotency"
+        },
+        {
+          "step": 2,
+          "owner": "architect",
+          "severity": "high",
+          "action": "Provide topology, scaling strategy, and consistency strategy"
+        },
+        {
+          "step": 3,
+          "owner": "security",
+          "severity": "high",
+          "action": "Define retention/deletion policy mapped to compliance requirements"
+        },
+        {
+          "step": 4,
+          "owner": "pjm",
+          "severity": "high",
+          "action": "Split scope or increase timeline to reduce delivery risk"
+        },
+        {
+          "step": 5,
+          "owner": "ui",
+          "severity": "medium",
+          "action": "Define design tokens and interaction states"
+        },
+        {
+          "step": 6,
+          "owner": "reviewer",
+          "severity": "medium",
+          "action": "Add negative/failure branch tests for critical APIs"
+        }
+      ]
+    },
+    {
+      "proposal_id": "unsafe_beta",
+      "actions": [
+        {
+          "step": 1,
+          "owner": "security",
+          "severity": "critical",
+          "action": "Add controls: tenant_isolation, authn_authz, encryption_at_rest, idempotency"
+        },
+        {
+          "step": 2,
+          "owner": "security",
+          "severity": "high",
+          "action": "Define retention/deletion policy mapped to compliance requirements"
+        },
+        {
+          "step": 3,
+          "owner": "reviewer",
+          "severity": "high",
+          "action": "Add success/failure branch tests before implementation"
+        },
+        {
+          "step": 4,
+          "owner": "pjm",
+          "severity": "high",
+          "action": "Split scope or increase timeline to reduce delivery risk"
+        },
+        {
+          "step": 5,
+          "owner": "architect",
+          "severity": "medium",
+          "action": "Add API versioning, storage model, and scaling details"
+        },
+        {
+          "step": 6,
+          "owner": "ui",
+          "severity": "medium",
+          "action": "Define design tokens and interaction states"
+        }
+      ]
+    }
+  ]
+}

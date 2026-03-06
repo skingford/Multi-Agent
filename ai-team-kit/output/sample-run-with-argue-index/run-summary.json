@@ -1,0 +1,30 @@
+{
+  "input": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/examples/argue-sample-input.json",
+  "output_dir": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/output/sample-run-with-argue-index",
+  "files": [
+    "PRD.md",
+    "SPRINT_BOARD.md",
+    "ARCHITECTURE.md",
+    "api.swagger.yaml",
+    "schema.sql",
+    "SECURITY_REPORT.md",
+    "REVIEW_REPORT.md",
+    "AUTO_ARGUE_DECISION_INDEX.json"
+  ],
+  "argue_enabled": true,
+  "argue_output_mode": "index",
+  "argue_schema_version": "1.3.0",
+  "argue_decision_index": {
+    "selected_proposal_id": "secure_mvp",
+    "total_proposals": 2,
+    "winner_confidence": 1
+  },
+  "argue_final_decision": {
+    "selected_proposal_id": "secure_mvp",
+    "status": "approved",
+    "reason": "majority_support",
+    "security_gate": "passed"
+  },
+  "models": {},
+  "generated_at": "2026-03-06"
+}

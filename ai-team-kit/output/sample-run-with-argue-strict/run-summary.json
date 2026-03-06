@@ -1,0 +1,24 @@
+{
+  "input": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/examples/argue-all-veto-input.json",
+  "output_dir": "/Users/kingford/workspace/github.com/Multi-Agent/ai-team-kit/output/sample-run-with-argue-strict",
+  "files": [
+    "PRD.md",
+    "SPRINT_BOARD.md",
+    "ARCHITECTURE.md",
+    "api.swagger.yaml",
+    "schema.sql",
+    "SECURITY_REPORT.md",
+    "REVIEW_REPORT.md",
+    "AUTO_ARGUE_RESULT.json",
+    "AUTO_ARGUE_RESULT.md"
+  ],
+  "argue_enabled": true,
+  "argue_final_decision": {
+    "selected_proposal_id": null,
+    "status": "rejected",
+    "reason": "no_approved_proposal_after_gate",
+    "security_gate": "blocked_or_pending_revisions"
+  },
+  "models": {},
+  "generated_at": "2026-03-06"
+}

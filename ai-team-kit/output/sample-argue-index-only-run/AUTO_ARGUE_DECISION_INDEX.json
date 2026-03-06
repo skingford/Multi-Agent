@@ -1,0 +1,46 @@
+{
+  "selected_proposal_id": "secure_mvp",
+  "total_proposals": 2,
+  "items": {
+    "secure_mvp": {
+      "status": "approved",
+      "gate": "passed",
+      "reason": "majority_support",
+      "score": 24,
+      "security_vote": "approve",
+      "vote_summary": {
+        "approve": 8,
+        "approve_with_notes": 0,
+        "changes_requested": 0,
+        "block": 0
+      },
+      "objection_summary": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0
+      },
+      "patch_action_count": 0,
+      "is_selected": true
+    },
+    "fast_track": {
+      "status": "rejected",
+      "gate": "blocked",
+      "reason": "security_veto_gate_triggered",
+      "score": -1000,
+      "security_vote": "block",
+      "vote_summary": {
+        "approve": 4,
+        "approve_with_notes": 3,
+        "changes_requested": 0,
+        "block": 1
+      },
+      "objection_summary": {
+        "critical": 1,
+        "high": 1,
+        "medium": 3
+      },
+      "patch_action_count": 5,
+      "is_selected": false
+    }
+  }
+}

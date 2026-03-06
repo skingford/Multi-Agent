@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.2.0",
+  "schema_ref": "ai-team-kit/schemas/CI_GATE_REPORT.compact.schema.json",
+  "schema_sha256": "bfa5ed07977ec210aee67c654ea63092f46c7529ef2d3c9c87ba5a99d559b599",
+  "report_variant": "compact",
+  "report_type": "ci_gate_report",
+  "generated_by": "generate-team-artifacts",
+  "compatibility": {
+    "contract": "ci_gate_report",
+    "backward_compatible_with": [
+      "1.1.0"
+    ]
+  },
+  "tool": "generate-team-artifacts",
+  "passed": true,
+  "exit_code": 0,
+  "reason": "ok",
+  "gate_trace": [
+    {
+      "id": "reject_gate",
+      "enabled": false,
+      "passed": true,
+      "code": 2
+    },
+    {
+      "id": "confidence_gate",
+      "enabled": false,
+      "passed": true,
+      "code": 3
+    },
+    {
+      "id": "security_approve_gate",
+      "enabled": false,
+      "passed": true,
+      "code": 4
+    }
+  ],
+  "selected_proposal_id": "secure_mvp",
+  "winner_confidence": 1,
+  "selected_security_vote": "approve"
+}

@@ -1,24 +1,112 @@
 #!/usr/bin/env node
 import fs from 'node:fs'
 import path from 'node:path'
+import crypto from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+import { orchestrate } from './auto-argue-orchestrator.mjs'
 
-const [, , inputPath, outputDirArg] = process.argv
+const STRICT_CI_DEFAULT_MIN_CONFIDENCE = 0.75
+const RUN_SUMMARY_SCHEMA_VERSION = '1.1.0'
+const RUN_SUMMARY_SCHEMA_REF = 'ai-team-kit/schemas/run-summary.schema.json'
+const CI_REPORT_FULL_SCHEMA_VERSION = '1.2.0'
+const CI_REPORT_COMPACT_SCHEMA_VERSION = '1.2.0'
+const CI_REPORT_TYPE = 'ci_gate_report'
+const CI_REPORT_BACKWARD_COMPATIBLE_WITH = ['1.1.0']
+const CI_REPORT_FULL_SCHEMA_REF = 'ai-team-kit/schemas/CI_GATE_REPORT.full.schema.json'
+const CI_REPORT_COMPACT_SCHEMA_REF = 'ai-team-kit/schemas/CI_GATE_REPORT.compact.schema.json'
+const modulePath = fileURLToPath(import.meta.url)
+const scriptDir = path.dirname(modulePath)
+const workspaceRoot = path.resolve(scriptDir, '..', '..')
+const computeSchemaSha256 = schemaRef => {
+  const schemaPath = path.resolve(workspaceRoot, schemaRef)
+  if (!fs.existsSync(schemaPath)) {
+    throw new Error(`Schema file not found for ${schemaRef}: ${schemaPath}`)
+  }
+  return crypto.createHash('sha256').update(fs.readFileSync(schemaPath, 'utf8')).digest('hex')
+}
+
+const cliArgs = process.argv.slice(2)
+const positionalArgs = cliArgs.filter(arg => !arg.startsWith('--'))
+const flags = new Set(cliArgs.filter(arg => arg.startsWith('--')))
+const strictProposalLimitArg = cliArgs.find(arg => arg.startsWith('--strict-proposal-limit='))
+const minWinnerConfidenceArg = cliArgs.find(arg => arg.startsWith('--min-winner-confidence='))
+const ciReportCompact = flags.has('--ci-report-compact')
+const ciReportArg = cliArgs.find(arg => arg === '--ci-report' || arg.startsWith('--ci-report='))
+const [inputPath, outputDirArg] = positionalArgs
+const strictCi = flags.has('--strict-ci')
+const failOnReject = flags.has('--fail-on-reject') || strictCi
+const requireSecurityApprove = flags.has('--require-security-approve') || strictCi
+const argueJsonOnly = flags.has('--argue-json-only')
+const argueMdOnly = flags.has('--argue-md-only')
+const argueIndexOnly = flags.has('--argue-index-only')
+const argueOutputMode = argueIndexOnly ? 'index' : argueJsonOnly ? 'json' : argueMdOnly ? 'md' : 'both'
+let strictProposalLimit = null
+let minWinnerConfidence = null
+let ciReportPath = null
+
+if (strictProposalLimitArg) {
+  const raw = strictProposalLimitArg.split('=')[1]
+  const parsed = Number.parseInt(raw, 10)
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    console.error(`Invalid --strict-proposal-limit value: ${raw}`)
+    process.exit(1)
+  }
+  strictProposalLimit = parsed
+}
+if (minWinnerConfidenceArg) {
+  const raw = minWinnerConfidenceArg.split('=')[1]
+  const parsed = Number.parseFloat(raw)
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 1) {
+    console.error(`Invalid --min-winner-confidence value: ${raw}`)
+    process.exit(1)
+  }
+  minWinnerConfidence = parsed
+} else if (strictCi) {
+  minWinnerConfidence = STRICT_CI_DEFAULT_MIN_CONFIDENCE
+}
+if (ciReportArg && ciReportArg.startsWith('--ci-report=')) {
+  const raw = ciReportArg.split('=')[1]
+  if (!raw) {
+    console.error('Invalid --ci-report value: path cannot be empty')
+    process.exit(1)
+  }
+  ciReportPath = path.resolve(process.cwd(), raw)
+}
 
 if (!inputPath) {
-  console.error('Usage: node generate-team-artifacts.mjs <input.json> [output-dir]')
+  console.error(
+    'Usage: node generate-team-artifacts.mjs <input.json> [output-dir] [--with-argue] [--strict-ci] [--fail-on-reject] [--require-security-approve] [--argue-json-only|--argue-md-only|--argue-index-only] [--strict-proposal-limit=N] [--min-winner-confidence=0.0..1.0] [--ci-report|--ci-report=<path>] [--ci-report-compact]'
+  )
+  process.exit(1)
+}
+if (argueJsonOnly && argueMdOnly) {
+  console.error('Invalid flags: --argue-json-only and --argue-md-only cannot be used together')
+  process.exit(1)
+}
+if (argueIndexOnly && (argueJsonOnly || argueMdOnly)) {
+  console.error('Invalid flags: --argue-index-only cannot be combined with --argue-json-only or --argue-md-only')
   process.exit(1)
 }
 
 const resolvedInput = path.resolve(process.cwd(), inputPath)
-const resolvedOutput = path.resolve(process.cwd(), outputDirArg || 'docs/ai-team-kit/output/sample-run')
+const resolvedOutput = path.resolve(process.cwd(), outputDirArg || 'ai-team-kit/output/sample-run')
+if ((ciReportArg || ciReportCompact) && !ciReportPath) {
+  ciReportPath = path.join(resolvedOutput, 'CI_GATE_REPORT.json')
+}
 
 if (!fs.existsSync(resolvedInput)) {
   console.error(`Input file not found: ${resolvedInput}`)
   process.exit(1)
 }
 
-const raw = fs.readFileSync(resolvedInput, 'utf8')
-const data = JSON.parse(raw)
+let data = {}
+try {
+  const raw = fs.readFileSync(resolvedInput, 'utf8')
+  data = JSON.parse(raw)
+} catch (error) {
+  console.error(`Failed to read input JSON: ${error.message}`)
+  process.exit(1)
+}
 
 const now = new Date().toISOString().slice(0, 10)
 const project = data.project || {}
@@ -27,6 +115,12 @@ const constraints = data.constraints || {}
 const features = data.features || []
 const personas = data.personas || []
 const models = data.platform_models || {}
+const enableArgue =
+  flags.has('--with-argue') ||
+  (Array.isArray(data.proposals) && data.proposals.length > 0) ||
+  strictProposalLimit !== null ||
+  minWinnerConfidence !== null ||
+  requireSecurityApprove
 
 const safeList = (items = [], fallback = 'N/A') => {
   if (!items.length) return `- ${fallback}`
@@ -328,22 +422,237 @@ const files = new Map([
   ['REVIEW_REPORT.md', reviewReport]
 ])
 
+let argueResult = null
+if (enableArgue) {
+  try {
+    const { result, markdown } = orchestrate(data, { strictProposalLimit })
+    if (argueOutputMode === 'index') {
+      files.set('AUTO_ARGUE_DECISION_INDEX.json', JSON.stringify(result.decision_index, null, 2))
+    } else if (argueOutputMode !== 'md') {
+      files.set('AUTO_ARGUE_RESULT.json', JSON.stringify(result, null, 2))
+    }
+    if (argueOutputMode === 'both' || argueOutputMode === 'md') {
+      files.set('AUTO_ARGUE_RESULT.md', markdown.trim())
+    }
+    argueResult = result
+  } catch (error) {
+    console.error(`Argue orchestration failed: ${error.message}`)
+    process.exit(1)
+  }
+}
+
 fs.mkdirSync(resolvedOutput, { recursive: true })
 
 for (const [name, content] of files) {
   fs.writeFileSync(path.join(resolvedOutput, name), `${content.trim()}\n`, 'utf8')
 }
 
+const selectedId = argueResult?.decision_index?.selected_proposal_id || null
+const selected = selectedId ? argueResult?.decision_index?.items?.[selectedId] : null
+const rejectGateFailed =
+  Boolean(failOnReject && enableArgue && argueResult?.final_decision?.status !== 'approved')
+const confidenceGateFailed = Boolean(
+  minWinnerConfidence !== null &&
+    enableArgue &&
+    argueResult?.decision_index &&
+    argueResult.decision_index.winner_confidence < minWinnerConfidence
+)
+const securityGateFailed = Boolean(
+  requireSecurityApprove && enableArgue && !(selected && selected.security_vote === 'approve')
+)
+
+const gateTrace = [
+  {
+    id: 'reject_gate',
+    enabled: failOnReject && enableArgue,
+    passed: !rejectGateFailed,
+    code: 2
+  },
+  {
+    id: 'confidence_gate',
+    enabled: minWinnerConfidence !== null && enableArgue,
+    passed: !confidenceGateFailed,
+    code: 3
+  },
+  {
+    id: 'security_approve_gate',
+    enabled: requireSecurityApprove && enableArgue,
+    passed: !securityGateFailed,
+    code: 4
+  }
+]
+
+let gateFailure = null
+if (rejectGateFailed) {
+  gateFailure = {
+    code: 2,
+    reason: 'reject_gate_failed',
+    message: `Rejected by gate policy: ${argueResult?.final_decision?.reason} (${argueResult?.final_decision?.security_gate})`
+  }
+} else if (confidenceGateFailed) {
+  gateFailure = {
+    code: 3,
+    reason: 'confidence_gate_failed',
+    message: `Winner confidence ${argueResult.decision_index.winner_confidence} is below required ${minWinnerConfidence}`
+  }
+} else if (securityGateFailed) {
+  gateFailure = {
+    code: 4,
+    reason: 'security_approve_gate_failed',
+    message: `Security approval required but not met (selected=${selectedId || 'none'}, security_vote=${selected?.security_vote || 'none'})`
+  }
+}
+
+const gateOutcome = gateFailure
+  ? {
+      passed: false,
+      exit_code: gateFailure.code,
+      reason: gateFailure.reason,
+      message: gateFailure.message
+    }
+  : {
+      passed: true,
+      exit_code: 0,
+      reason: 'ok',
+      message: enableArgue ? 'all enabled gates passed' : 'argue disabled; no gates evaluated'
+    }
+
+let runSummarySchemaSha256
+let ciFullSchemaSha256 = null
+let ciCompactSchemaSha256 = null
+try {
+  runSummarySchemaSha256 = computeSchemaSha256(RUN_SUMMARY_SCHEMA_REF)
+  if (ciReportPath) {
+    ciFullSchemaSha256 = computeSchemaSha256(CI_REPORT_FULL_SCHEMA_REF)
+    ciCompactSchemaSha256 = computeSchemaSha256(CI_REPORT_COMPACT_SCHEMA_REF)
+  }
+} catch (error) {
+  console.error(`Schema resolution failed: ${error.message}`)
+  process.exit(1)
+}
+
+const summaryPath = path.join(resolvedOutput, 'run-summary.json')
 const summary = {
+  schema_version: RUN_SUMMARY_SCHEMA_VERSION,
+  schema_ref: RUN_SUMMARY_SCHEMA_REF,
+  schema_sha256: runSummarySchemaSha256,
   input: resolvedInput,
   output_dir: resolvedOutput,
   files: Array.from(files.keys()),
+  argue_enabled: enableArgue,
+  argue_output_mode: enableArgue ? argueOutputMode : 'disabled',
+  argue_schema_version: argueResult?.schema_version || null,
+  argue_decision_index: argueResult?.decision_index
+    ? {
+        selected_proposal_id: argueResult.decision_index.selected_proposal_id,
+        total_proposals: argueResult.decision_index.total_proposals,
+        winner_confidence: argueResult.decision_index.winner_confidence
+      }
+    : null,
+  min_winner_confidence_required: minWinnerConfidence,
+  min_winner_confidence_met:
+    minWinnerConfidence === null
+      ? null
+      : Boolean(
+          argueResult?.decision_index &&
+            argueResult.decision_index.winner_confidence >= minWinnerConfidence
+        ),
+  security_approve_required: requireSecurityApprove,
+  security_approve_met: requireSecurityApprove
+    ? Boolean(
+        argueResult?.decision_index?.selected_proposal_id &&
+          argueResult.decision_index.items[argueResult.decision_index.selected_proposal_id]
+            ?.security_vote === 'approve'
+      )
+    : null,
+  strict_ci_enabled: strictCi,
+  gate_trace: gateTrace,
+  gate_outcome: gateOutcome,
+  argue_final_decision: argueResult?.final_decision || null,
   models,
   generated_at: now
 }
-fs.writeFileSync(path.join(resolvedOutput, 'run-summary.json'), JSON.stringify(summary, null, 2) + '\n', 'utf8')
+fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2) + '\n', 'utf8')
+
+if (ciReportPath) {
+  const artifactPaths = [...Array.from(files.keys()).map(name => path.join(resolvedOutput, name)), summaryPath]
+  const report = ciReportCompact
+    ? {
+        schema_version: CI_REPORT_COMPACT_SCHEMA_VERSION,
+        schema_ref: CI_REPORT_COMPACT_SCHEMA_REF,
+        schema_sha256: ciCompactSchemaSha256,
+        report_variant: 'compact',
+        report_type: CI_REPORT_TYPE,
+        generated_by: 'generate-team-artifacts',
+        compatibility: {
+          contract: CI_REPORT_TYPE,
+          backward_compatible_with: CI_REPORT_BACKWARD_COMPATIBLE_WITH
+        },
+        tool: 'generate-team-artifacts',
+        passed: !gateFailure,
+        exit_code: gateFailure?.code || 0,
+        reason: gateFailure?.reason || 'ok',
+        gate_trace: gateTrace,
+        selected_proposal_id: argueResult?.final_decision?.selected_proposal_id || null,
+        winner_confidence: argueResult?.decision_index?.winner_confidence ?? null,
+        selected_security_vote: selected?.security_vote || null
+      }
+    : {
+        schema_version: CI_REPORT_FULL_SCHEMA_VERSION,
+        schema_ref: CI_REPORT_FULL_SCHEMA_REF,
+        schema_sha256: ciFullSchemaSha256,
+        report_variant: 'full',
+        report_type: CI_REPORT_TYPE,
+        generated_by: 'generate-team-artifacts',
+        compatibility: {
+          contract: CI_REPORT_TYPE,
+          backward_compatible_with: CI_REPORT_BACKWARD_COMPATIBLE_WITH
+        },
+        generated_at: new Date().toISOString(),
+        tool: 'generate-team-artifacts',
+        input: resolvedInput,
+        output_dir: resolvedOutput,
+        strict_ci_enabled: strictCi,
+        gates: {
+          fail_on_reject: failOnReject,
+          require_security_approve: requireSecurityApprove,
+          min_winner_confidence_required: minWinnerConfidence,
+          strict_proposal_limit: strictProposalLimit
+        },
+        decision: {
+          selected_proposal_id: argueResult?.final_decision?.selected_proposal_id || null,
+          final_status: argueResult?.final_decision?.status || 'not_run',
+          final_reason: argueResult?.final_decision?.reason || null,
+          security_gate: argueResult?.final_decision?.security_gate || null,
+          selected_security_vote: selected?.security_vote || null,
+          winner_confidence: argueResult?.decision_index?.winner_confidence ?? null
+        },
+        outcome: gateOutcome,
+        gate_trace: gateTrace,
+        artifacts: [...artifactPaths, ciReportPath]
+      }
+  fs.mkdirSync(path.dirname(ciReportPath), { recursive: true })
+  fs.writeFileSync(ciReportPath, JSON.stringify(report, null, 2) + '\n', 'utf8')
+}
+
+if (gateFailure) {
+  console.error(gateFailure.message)
+  console.error(`Artifacts written to: ${resolvedOutput}`)
+  for (const name of files.keys()) {
+    console.error(`- ${path.join(resolvedOutput, name)}`)
+  }
+  console.error(`- ${summaryPath}`)
+  if (ciReportPath) {
+    console.error(`- ${ciReportPath}`)
+  }
+  process.exit(gateFailure.code)
+}
 
 console.log(`Generated ${files.size} artifacts into ${resolvedOutput}`)
 for (const name of files.keys()) {
   console.log(`- ${path.join(resolvedOutput, name)}`)
+}
+console.log(`- ${summaryPath}`)
+if (ciReportPath) {
+  console.log(`- ${ciReportPath}`)
 }

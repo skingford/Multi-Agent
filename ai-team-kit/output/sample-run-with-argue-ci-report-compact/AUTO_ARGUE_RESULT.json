@@ -1,0 +1,348 @@
+{
+  "schema_version": "1.3.0",
+  "project": "Oxmon 智能告警仲裁中心",
+  "generated_at": "2026-03-06T10:52:04.073Z",
+  "gate_policy": {
+    "name": "Security One-Vote Veto Gate",
+    "rule": "If security role votes block, proposal is automatically rejected."
+  },
+  "rounds": {
+    "proposal": [
+      {
+        "proposal_id": "fast_track",
+        "proposer": "pm",
+        "title": "4 周极速上线",
+        "description": "优先上线核心路径，后续补治理",
+        "timeline_weeks": 4
+      },
+      {
+        "proposal_id": "secure_mvp",
+        "proposer": "architect",
+        "title": "8 周安全优先 MVP",
+        "description": "先建立多租户隔离、安全基线与完整测试门禁",
+        "timeline_weeks": 8
+      }
+    ],
+    "objection": [
+      {
+        "proposal_id": "fast_track",
+        "objections": [
+          {
+            "role": "pm",
+            "findings": []
+          },
+          {
+            "role": "architect",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "Architecture notes are too shallow for execution",
+                "fix": "Add API versioning, storage model, and scaling details"
+              }
+            ]
+          },
+          {
+            "role": "security",
+            "findings": [
+              {
+                "severity": "critical",
+                "issue": "Missing required security controls: tenant_isolation, audit_log, encryption_at_rest, idempotency",
+                "fix": "Add controls: tenant_isolation, audit_log, encryption_at_rest, idempotency"
+              },
+              {
+                "severity": "high",
+                "issue": "Compliance exists but data retention policy is missing",
+                "fix": "Define retention/deletion policy mapped to compliance requirements"
+              }
+            ]
+          },
+          {
+            "role": "ui",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "UI scope is undefined",
+                "fix": "Define design tokens and interaction states"
+              }
+            ]
+          },
+          {
+            "role": "frontend",
+            "findings": []
+          },
+          {
+            "role": "backend",
+            "findings": []
+          },
+          {
+            "role": "reviewer",
+            "findings": [
+              {
+                "severity": "medium",
+                "issue": "Test plan has no clear failure-path coverage",
+                "fix": "Add negative/failure branch tests for critical APIs"
+              }
+            ]
+          },
+          {
+            "role": "pjm",
+            "findings": []
+          }
+        ]
+      },
+      {
+        "proposal_id": "secure_mvp",
+        "objections": [
+          {
+            "role": "pm",
+            "findings": []
+          },
+          {
+            "role": "architect",
+            "findings": []
+          },
+          {
+            "role": "security",
+            "findings": []
+          },
+          {
+            "role": "ui",
+            "findings": []
+          },
+          {
+            "role": "frontend",
+            "findings": []
+          },
+          {
+            "role": "backend",
+            "findings": []
+          },
+          {
+            "role": "reviewer",
+            "findings": []
+          },
+          {
+            "role": "pjm",
+            "findings": []
+          }
+        ]
+      }
+    ],
+    "vote": [
+      {
+        "proposal_id": "fast_track",
+        "votes": [
+          {
+            "role": "pm",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "architect",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "security",
+            "decision": "block",
+            "reason": "critical security finding"
+          },
+          {
+            "role": "ui",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "frontend",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "backend",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "reviewer",
+            "decision": "approve_with_notes",
+            "reason": "non-blocking concerns exist"
+          },
+          {
+            "role": "pjm",
+            "decision": "approve",
+            "reason": "ready for execution"
+          }
+        ]
+      },
+      {
+        "proposal_id": "secure_mvp",
+        "votes": [
+          {
+            "role": "pm",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "architect",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "security",
+            "decision": "approve",
+            "reason": "security baseline satisfied"
+          },
+          {
+            "role": "ui",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "frontend",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "backend",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "reviewer",
+            "decision": "approve",
+            "reason": "ready for execution"
+          },
+          {
+            "role": "pjm",
+            "decision": "approve",
+            "reason": "ready for execution"
+          }
+        ]
+      }
+    ]
+  },
+  "proposals": [
+    {
+      "proposal_id": "secure_mvp",
+      "status": "approved",
+      "score": 24,
+      "reason": "majority_support",
+      "gate": "passed",
+      "vote_summary": {
+        "approve": 8,
+        "approve_with_notes": 0,
+        "changes_requested": 0,
+        "block": 0
+      }
+    },
+    {
+      "proposal_id": "fast_track",
+      "status": "rejected",
+      "score": -1000,
+      "reason": "security_veto_gate_triggered",
+      "gate": "blocked",
+      "vote_summary": {
+        "approve": 4,
+        "approve_with_notes": 3,
+        "changes_requested": 0,
+        "block": 1
+      }
+    }
+  ],
+  "decision_index": {
+    "selected_proposal_id": "secure_mvp",
+    "total_proposals": 2,
+    "winner_confidence": 1,
+    "items": {
+      "secure_mvp": {
+        "status": "approved",
+        "gate": "passed",
+        "reason": "majority_support",
+        "score": 24,
+        "security_vote": "approve",
+        "vote_summary": {
+          "approve": 8,
+          "approve_with_notes": 0,
+          "changes_requested": 0,
+          "block": 0
+        },
+        "objection_summary": {
+          "critical": 0,
+          "high": 0,
+          "medium": 0
+        },
+        "patch_action_count": 0,
+        "confidence_score": 0.95,
+        "is_selected": true
+      },
+      "fast_track": {
+        "status": "rejected",
+        "gate": "blocked",
+        "reason": "security_veto_gate_triggered",
+        "score": -1000,
+        "security_vote": "block",
+        "vote_summary": {
+          "approve": 4,
+          "approve_with_notes": 3,
+          "changes_requested": 0,
+          "block": 1
+        },
+        "objection_summary": {
+          "critical": 1,
+          "high": 1,
+          "medium": 3
+        },
+        "patch_action_count": 5,
+        "confidence_score": 0,
+        "is_selected": false
+      }
+    }
+  },
+  "final_decision": {
+    "selected_proposal_id": "secure_mvp",
+    "status": "approved",
+    "reason": "majority_support",
+    "security_gate": "passed"
+  },
+  "patch_plan": [
+    {
+      "proposal_id": "fast_track",
+      "actions": [
+        {
+          "step": 1,
+          "owner": "security",
+          "severity": "critical",
+          "action": "Add controls: tenant_isolation, audit_log, encryption_at_rest, idempotency"
+        },
+        {
+          "step": 2,
+          "owner": "security",
+          "severity": "high",
+          "action": "Define retention/deletion policy mapped to compliance requirements"
+        },
+        {
+          "step": 3,
+          "owner": "architect",
+          "severity": "medium",
+          "action": "Add API versioning, storage model, and scaling details"
+        },
+        {
+          "step": 4,
+          "owner": "ui",
+          "severity": "medium",
+          "action": "Define design tokens and interaction states"
+        },
+        {
+          "step": 5,
+          "owner": "reviewer",
+          "severity": "medium",
+          "action": "Add negative/failure branch tests for critical APIs"
+        }
+      ]
+    },
+    {
+      "proposal_id": "secure_mvp",
+      "actions": []
+    }
+  ]
+}
